@@ -1,0 +1,6 @@
+@IndraCommerce_HostAddress = http://localhost:5188
+
+GET {{IndraCommerce_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
