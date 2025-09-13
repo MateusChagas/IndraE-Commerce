@@ -1,0 +1,24 @@
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 80
+
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["EstoqueService.Api/EstoqueService.Api.csproj", "EstoqueService.Api/"]
+COPY ["EstoqueService.Domain/EstoqueService.Domain.csproj", "EstoqueService.Domain/"]
+COPY ["EstoqueService.Infrastructure/EstoqueService.Infrastructure.csproj", "EstoqueService.Infrastructure/"]
+RUN dotnet restore "EstoqueService.Api/EstoqueService.Api.csproj"
+COPY . .
+WORKDIR "/src/EstoqueService.Api"
+RUN dotnet build "EstoqueService.Api.csproj" -c Release -o /app/build
+
+
+FROM build AS publish
+RUN dotnet publish "EstoqueService.Api.csproj" -c Release -o /app/publish
+
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+ENTRYPOINT ["dotnet", "EstoqueService.Api.dll"]
